@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Player Minimalist</title>
     <style>
-        /* CSS - Design-ul Player-ului */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #121212;
@@ -26,8 +25,8 @@
             text-align: center;
         }
 
-        .song-info h2 { margin: 0; font-size: 1.2rem; }
-        .song-info p { color: #b3b3b3; font-size: 0.9rem; }
+        .song-info h2 { margin: 0; font-size: 1.2rem; height: 1.5rem; overflow: hidden; }
+        .song-info p { color: #b3b3b3; font-size: 0.9rem; margin-top: 5px; }
 
         .controls {
             display: flex;
@@ -47,7 +46,6 @@
         }
 
         button:hover { transform: scale(1.1); color: #1DB954; }
-
         #play-btn { font-size: 2.5rem; }
 
         .progress-container {
@@ -81,10 +79,17 @@
             cursor: pointer;
             font-size: 0.85rem;
             border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .playlist-item:hover { background: #333; }
-        .active-song { color: #1DB954; font-weight: bold; }
+        .active-song { color: #1DB954; font-weight: bold; background: rgba(29, 185, 84, 0.1); }
+        
+        /* Scrollbar subtil pentru playlist */
+        .playlist::-webkit-scrollbar { width: 5px; }
+        .playlist::-webkit-scrollbar-thumb { background: #404040; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -95,7 +100,7 @@
         <p id="artist">Artist</p>
     </div>
 
-    <audio id="audio" src=""></audio>
+    <audio id="audio"></audio>
 
     <div class="progress-container" id="progress-container">
         <div class="progress-bar" id="progress-bar"></div>
@@ -107,12 +112,26 @@
         <button id="next">⏭</button>
     </div>
 
-    <div class="playlist" id="playlist">
-        </div>
+    <div class="playlist" id="playlist"></div>
 </div>
 
 <script>
-    // JS - Logica Player-ului
+    /** * UNICUL LOC PENTRU MODIFICARE:
+     * Adaugă sau scoate melodii aici. 
+     * Format: 'Nume Fisier (fara .mp3)|Titlu Afisat|Artist'
+     */
+    const rawPlaylist = [
+        "BODO x SUSANU - Duduie duduia|Duduie duduia|Bodo x Susanu",
+        "Dani Mocanu - Minora|Minora|Dani Mocanu",
+        "piesa3|Titlu Piesa 3|Artist Necunoscut"
+    ];
+
+    // Procesare automata a listei
+    const songs = rawPlaylist.map(item => {
+        const [file, title, artist] = item.split('|');
+        return { file: file.trim(), title: title.trim(), artist: artist.trim() };
+    });
+
     const audio = document.getElementById('audio');
     const playBtn = document.getElementById('play-btn');
     const prevBtn = document.getElementById('prev');
@@ -123,27 +142,20 @@
     const progressContainer = document.getElementById('progress-container');
     const playlistContainer = document.getElementById('playlist');
 
-    // Lista de melodii (Modifică aici cu numele fișierelor tale din folderul /song)
-    const songs = [
-        { name: 'BODO x SUSANU - Duduie duduia.mp3', displayName: 'Prima Melodie', artist: 'Artist 1' },
-        { name: 'Dani Mocanu - Minora', displayName: 'A doua Melodie', artist: 'Artist 2' },
-        { name: 'piesa3', displayName: 'A treia Melodie', artist: 'Artist 3' }
-    ];
-
     let songIndex = 0;
     let isPlaying = false;
 
-    // Încărcare melodie
     function loadSong(song) {
-        title.innerText = song.displayName;
+        title.innerText = song.title;
         artist.innerText = song.artist;
-        audio.src = `song/${song.name}.mp3`;
+        // Se presupune ca melodiile sunt in folderul 'song/' si au extensia .mp3
+        audio.src = `song/${song.file}.mp3`;
     }
 
     function playSong() {
         isPlaying = true;
         playBtn.innerText = '⏸';
-        audio.play();
+        audio.play().catch(e => console.log("Eroare la redare: ", e));
     }
 
     function pauseSong() {
@@ -152,48 +164,12 @@
         audio.pause();
     }
 
-    // Evenimente Control
-    playBtn.addEventListener('click', () => (isPlaying ? pauseSong() : playSong()));
-
-    prevBtn.addEventListener('click', () => {
-        songIndex--;
-        if (songIndex < 0) songIndex = songs.length - 1;
-        loadSong(songs[songIndex]);
-        playSong();
-        updatePlaylistUI();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        songIndex++;
-        if (songIndex > songs.length - 1) songIndex = 0;
-        loadSong(songs[songIndex]);
-        playSong();
-        updatePlaylistUI();
-    });
-
-    // Actualizare Progress Bar
-    audio.addEventListener('timeupdate', (e) => {
-        const { duration, currentTime } = e.srcElement;
-        const progressPercent = (currentTime / duration) * 100;
-        progressBar.style.width = `${progressPercent}%`;
-    });
-
-    // Click pe bara de progres
-    progressContainer.addEventListener('click', (e) => {
-        const width = progressContainer.clientWidth;
-        const clickX = e.offsetX;
-        const duration = audio.duration;
-        audio.currentTime = (clickX / width) * duration;
-    });
-
-    // Generare Playlist în HTML
     function updatePlaylistUI() {
         playlistContainer.innerHTML = '';
         songs.forEach((song, index) => {
             const item = document.createElement('div');
-            item.classList.add('playlist-item');
-            if(index === songIndex) item.classList.add('active-song');
-            item.innerText = `${index + 1}. ${song.displayName}`;
+            item.className = `playlist-item ${index === songIndex ? 'active-song' : ''}`;
+            item.innerText = `${index + 1}. ${song.title}`;
             item.onclick = () => {
                 songIndex = index;
                 loadSong(songs[songIndex]);
@@ -204,15 +180,43 @@
         });
     }
 
-    // Inițializare
-    loadSong(songs[songIndex]);
-    updatePlaylistUI();
-    
-    // Auto-next când se termină piesa
+    playBtn.addEventListener('click', () => (isPlaying ? pauseSong() : playSong()));
+
+    prevBtn.addEventListener('click', () => {
+        songIndex = (songIndex - 1 + songs.length) % songs.length;
+        loadSong(songs[songIndex]);
+        if(isPlaying) playSong();
+        updatePlaylistUI();
+    });
+
+    nextBtn.addEventListener('click', () => {
+        songIndex = (songIndex + 1) % songs.length;
+        loadSong(songs[songIndex]);
+        if(isPlaying) playSong();
+        updatePlaylistUI();
+    });
+
+    audio.addEventListener('timeupdate', (e) => {
+        const { duration, currentTime } = e.srcElement;
+        if (duration) {
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+        }
+    });
+
+    progressContainer.addEventListener('click', (e) => {
+        const width = progressContainer.clientWidth;
+        const clickX = e.offsetX;
+        const duration = audio.duration;
+        audio.currentTime = (clickX / width) * duration;
+    });
+
     audio.addEventListener('ended', () => nextBtn.click());
 
+    // Pornire initiala
+    loadSong(songs[songIndex]);
+    updatePlaylistUI();
 </script>
 
 </body>
-
 </html>
