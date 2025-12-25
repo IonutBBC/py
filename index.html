@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Top Muzică</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="player">
+    <div id="startOverlay" style="
+    position:absolute;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.7);
+    display:flex; justify-content:center; align-items:center;
+    color:white; font-size:44px; cursor:pointer;
+    z-index:9999;
+">
+    🎵 Apasă aici pentru a porni muzica
+</div>
+
+
+    <!-- LUMINI -->
+    <div class="lights-border"></div>
+    <div class="lights-bulbs"></div>
+
+    <!-- CONȚINUT -->
+    <h1 class="disco-title">IonutBBC</h1>
+    <h2>🎵 Top Manele & Dance</h2>
+
+    <ul id="playlist"></ul>
+
+    <audio id="audio" controls controlsList="nodownload noplaybackrate" disablePictureInPicture></audio>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

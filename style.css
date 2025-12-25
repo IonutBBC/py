@@ -1,0 +1,252 @@
+/* RESET TOTAL */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* FUNDAL PAGINĂ */
+body {
+    background: #0f172a;
+    color: white;
+    font-family: Arial, sans-serif;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* PLAYER */
+.player {
+    position: fixed;
+    inset: 0;
+    max-width: 100dvh;
+    margin: auto;
+
+    background: #020617;
+    padding: 16px 14px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 1;
+}
+
+/* ===================== */
+/* STRAT LUMINI (SUB UI) */
+/* ===================== */
+
+.lights-border,
+.lights-bulbs {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1; /* SUB CONȚINUT */
+}
+
+/* CONȚINUT PESTE LUMINI */
+.player > *:not(.lights-border):not(.lights-bulbs) {
+    position: relative;
+    z-index: 2;
+}
+
+/* ===================== */
+/* TITLU */
+/* ===================== */
+
+.disco-title {
+    text-align: center;
+    font-size: 60px;
+    margin: 10px 0 5px;
+    font-weight: bold;
+
+    background: linear-gradient(
+        90deg,
+        #ff0080,
+        #7928ca,
+        #00c6ff,
+        #00ff99,
+        #ffcc00,
+        #ff0080
+    );
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation: discoGlow 3s ease infinite, flicker 1.8s infinite;
+}
+
+h2 {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 10px;
+    opacity: 0.85;
+}
+
+/* ===================== */
+/* PLAYLIST */
+/* ===================== */
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    flex: 1;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    
+}
+
+li {
+    padding: 14px 10px;
+    margin: 4px 0;
+    font-size: 40px;
+    text-align: center;
+
+    background: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+li:hover {
+    background: #1e293b;
+    transform: scale(1.02);
+}
+
+li.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    font-weight: bold;
+}
+
+/* AUDIO INVIZIBIL */
+audio { display: none; }
+
+/* ===================== */
+/* BORDER LUMINOS */
+/* ===================== */
+
+.lights-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 6px;
+    border-radius: 18px;
+
+    background: linear-gradient(
+        90deg,
+        red, yellow, lime, cyan, blue, magenta, red
+    );
+    background-size: 400% 400%;
+    animation: lightsMove 6s linear infinite;
+
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
+}
+
+/* ===================== */
+/* BECULEȚE */
+/* ===================== */
+
+.bulb {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+    animation: blink 1.4s infinite alternate;
+}
+
+/* ===================== */
+/* ANIMAȚII */
+/* ===================== */
+
+@keyframes discoGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+@keyframes lightsMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes blink {
+    0% { opacity: 0.3; filter: brightness(0.6); }
+    100% { opacity: 1; filter: brightness(1.7); }
+}
+
+/* DESKTOP */
+@media (min-width: 768px) {
+    .player {
+        border-radius: 18px;
+        box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    }
+}
+
+#clickHint {
+    animation: pulse 1s infinite;
+    color: yellow;
+    font-size: 44px;
+}
+@keyframes pulse {
+    0% {opacity:1;}
+    50% {opacity:0.5;}
+    100% {opacity:1;}
+}
+
+
+/* ===================== */
+/* OVERLAY CLICK TO PLAY */
+/* ===================== */
+#startOverlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    z-index: 10; /* deasupra playerului */
+    border-radius: 18px;
+    padding: 20px;
+}
+
+/* Puls pentru atragerea atenției */
+#startOverlay {
+    animation: pulseOverlay 1.2s infinite;
+}
+
+@keyframes pulseOverlay {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
+
+
